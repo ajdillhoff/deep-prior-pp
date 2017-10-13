@@ -21,8 +21,6 @@ along with DeepPrior.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
-os.environ["THEANO_FLAGS"] = "device=gpu,floatX=float32"
-
 import numpy
 from data.dataset import NYUDataset, ICVLDataset
 from net.poseregnet import PoseRegNetParams, PoseRegNet
@@ -30,7 +28,7 @@ from net.resnet import ResNetParams, ResNet
 from net.scalenet import ScaleNetParams, ScaleNet
 from util.realtimehandposepipeline import RealtimeHandposePipeline
 from data.importers import ICVLImporter, NYUImporter, MSRA15Importer
-from util.cameradevice import CreativeCameraDevice, FileDevice
+from util.cameradevice import Kinect2Device, FileDevice
 
 
 __author__ = "Markus Oberweger <oberweger@icg.tugraz.at>"
@@ -49,28 +47,28 @@ if __name__ == '__main__':
     # Seq2 = di.loadSequence('test_seq_1')
     # testSeqs = [Seq2]
 
-    # di = ICVLImporter('../data/ICVL/')
-    # Seq2 = di.loadSequence('test_seq_1')
-    # testSeqs = [Seq2]
-
-    di = NYUImporter('../data/NYU/')
-    Seq2 = di.loadSequence('test_1')
+    di = ICVLImporter('/media/alex/Network Bac/Data Sets/ICVL/')
+    Seq2 = di.loadSequence('test_seq_1')
     testSeqs = [Seq2]
 
+    # di = NYUImporter('../data/NYU/')
+    # Seq2 = di.loadSequence('test_1')
+    # testSeqs = [Seq2]
+
     # load trained network
-    poseNetParams = PoseRegNetParams(type=11, nChan=1, wIn=128, hIn=128, batchSize=1, numJoints=14, nDims=3)
-    poseNetParams.loadFile = "./eval/NYU_network_prior.pkl"
+    poseNetParams = ResNetParams(type=2, nChan=1, wIn=128, hIn=128, batchSize=1, numJoints=16, nDims=3)
+    poseNetParams.loadFile = "/home/alex/Downloads/ICVL_network_prior.pkl"
     comrefNetParams = ScaleNetParams(type=1, nChan=1, wIn=128, hIn=128, batchSize=1, resizeFactor=2, numJoints=1, nDims=3)
-    comrefNetParams.loadFile = "./eval/net_NYU_COM_AUGMENT.pkl"
-    config = {'fx': 588., 'fy': 587., 'cube': (300, 300, 300)}
-    # config = {'fx': 241.42, 'fy': 241.42, 'cube': (250, 250, 250)}
+    comrefNetParams.loadFile = "/home/alex/Downloads/net_ICVL_COM_AUGMENT.pkl"
+    # config = {'fx': 588., 'fy': 587., 'cube': (300, 300, 300)}
+    config = {'fx': 241.42, 'fy': 241.42, 'cube': (250, 250, 250)}
     # config = {'fx': 224.5, 'fy': 230.5, 'cube': (300, 300, 300)}  # Creative Gesture Camera
     # di = ICVLImporter("./capture/")
-    # di.fx = 224.5
-    # di.fy = 230.5
+    # di.fx = config['fx']
+    # di.fy = config['fy']
     # di.ux = 160.
     # di.uy = 120.
-    rtp = RealtimeHandposePipeline(poseNetParams, config, di, verbose=False, comrefNet=comrefNetParams)
+    rtp = RealtimeHandposePipeline(poseNetParams, config, di, verbose=False, comrefNet=None)
 
     # use filenames
     filenames = []
@@ -80,4 +78,5 @@ if __name__ == '__main__':
 
     # # use depth camera
     # dev = CreativeCameraDevice(mirror=True)
-    rtp.processVideoThreaded(dev)
+    # dev = Kinect2Device(mirror=True)
+    rtp.processVideo(dev)

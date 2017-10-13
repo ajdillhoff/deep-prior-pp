@@ -230,6 +230,11 @@ class ResNet(NetBase):
 
             self.layers.append(HiddenLayer(rng, self.layers[-1].output,
                                            HiddenLayerParams(inputDim=self.layers[-1].cfgParams.outputDim,
+                                                             outputDim=(batchSize, 30), activation=None),
+                                           layerNum=len(self.layers)))
+
+            self.layers.append(HiddenLayer(rng, self.layers[-1].output,
+                                           HiddenLayerParams(inputDim=self.layers[-1].cfgParams.outputDim,
                                                              outputDim=(batchSize, self.cfgParams.numJoints*self.cfgParams.nDims),
                                                              activation=None),
                                            layerNum=len(self.layers)))

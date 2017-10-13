@@ -29,7 +29,7 @@ import cv2
 import time
 import numpy
 import copy
-from data.transformations import rotatePoints3D
+from data.transformations import rotatePoint3D, rotatePoints3D
 from net.poseregnet import PoseRegNet, PoseRegNetParams
 from net.resnet import ResNet, ResNetParams
 from net.scalenet import ScaleNet, ScaleNetParams
@@ -194,7 +194,7 @@ class RealtimeHandposePipeline(object):
             frm = copy.deepcopy(self.sync)
 
             startp = time.time()
-            pose = self.estimatePose(frm['crop'], frm['com3D'])
+            pose = self.estimatePose(frm['crop'])
             pose = pose * self.sync['config']['cube'][2]/2. + frm['com3D']
             if self.verbose is True:
                 print("{}ms pose".format((time.time() - startp)*1000.))
@@ -268,14 +268,14 @@ class RealtimeHandposePipeline(object):
                 print("{}ms detection".format((time.time() - startd)*1000.))
 
             startp = time.time()
-            pose = self.estimatePose(crop, com3D)
+            pose = self.estimatePose(crop)
             pose = pose*self.sync['config']['cube'][2]/2. + com3D
             if self.verbose is True:
                 print("{}ms pose".format((time.time() - startp)*1000.))
 
             # Display the resulting frame
             starts = time.time()
-            img, poseimg = self.show(frame, pose)
+            img, poseimg = self.show(frame, pose, com3D)
 
             img = self.addStatusBar(img)
             cv2.imshow('frame', img)
@@ -336,7 +336,7 @@ class RealtimeHandposePipeline(object):
             crop /= sc
             return crop, M, com3D
 
-    def estimatePose(self, crop, com3D):
+    def estimatePose(self, crop):
         """
         Estimate the hand pose
         :param crop: cropped hand depth map
@@ -369,11 +369,12 @@ class RealtimeHandposePipeline(object):
             jj[:, 0] *= (-1.)
         return jj
 
-    def show(self, frame, handpose):
+    def show(self, frame, handpose, com3D):
         """
         Show depth with overlaid joints
         :param frame: depth frame
-        :param handpose: joint positions
+        :param handpose: joint position
+        :param com3D: com detection crop position
         :return: image
         """
         upsample = 1.
