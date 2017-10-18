@@ -406,10 +406,10 @@ class RealtimeHandposePipeline(object):
             raise ValueError("Invalid number of joints {}".format(handpose.shape[0]))
 
         jtI = self.importer.joints3DToImg(handpose)
-        jtI[:, 0:2] -= numpy.asarray([frame.shape[0]//2, frame.shape[1]//2])
-        jtI[:, 0:2] *= upsample
-        jtI[:, 0:2] += numpy.asarray([imgcopy.shape[0]//2, imgcopy.shape[1]//2])
-        for i in xrange(handpose.shape[0]):
+        # jtI[:, 0:2] -= numpy.asarray([frame.shape[0]//2, frame.shape[1]//2])
+        # jtI[:, 0:2] *= upsample
+        # jtI[:, 0:2] += numpy.asarray([imgcopy.shape[0]//2, imgcopy.shape[1]//2])
+        for i in xrange(jtI.shape[0]):
             cv2.circle(imgcopy, (jtI[i, 0], jtI[i, 1]), 3, (255, 0, 0), -1)
 
         for i in xrange(len(hpe.jointConnections)):

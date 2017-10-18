@@ -47,36 +47,38 @@ if __name__ == '__main__':
     # Seq2 = di.loadSequence('test_seq_1')
     # testSeqs = [Seq2]
 
-    di = ICVLImporter('/media/alex/Network Bac/Data Sets/ICVL/')
-    Seq2 = di.loadSequence('test_seq_1')
-    testSeqs = [Seq2]
+    # di = ICVLImporter('/media/alex/Network Bac/Data Sets/ICVL/')
+    # Seq2 = di.loadSequence('test_seq_1')
+    # testSeqs = [Seq2]
 
     # di = NYUImporter('../data/NYU/')
     # Seq2 = di.loadSequence('test_1')
     # testSeqs = [Seq2]
 
     # load trained network
-    poseNetParams = ResNetParams(type=2, nChan=1, wIn=128, hIn=128, batchSize=1, numJoints=16, nDims=3)
-    poseNetParams.loadFile = "/home/alex/Downloads/ICVL_network_prior.pkl"
+    # poseNetParams = ResNetParams(type=2, nChan=1, wIn=128, hIn=128, batchSize=1, numJoints=16, nDims=3)
+    poseNetParams = PoseRegNetParams(type=11, nChan=1, wIn=128, hIn=128, batchSize=1, numJoints=14, nDims=3)
+    poseNetParams.loadFile = "/home/alex/Downloads/deep-prior-weights/NYU_network_prior.pkl"
     comrefNetParams = ScaleNetParams(type=1, nChan=1, wIn=128, hIn=128, batchSize=1, resizeFactor=2, numJoints=1, nDims=3)
-    comrefNetParams.loadFile = "/home/alex/Downloads/net_ICVL_COM_AUGMENT.pkl"
+    comrefNetParams.loadFile = "/home/alex/Downloads/deep-prior-weights/net_NYU_COM.pkl"
     # config = {'fx': 588., 'fy': 587., 'cube': (300, 300, 300)}
-    config = {'fx': 241.42, 'fy': 241.42, 'cube': (250, 250, 250)}
+    # config = {'fx': 241.42, 'fy': 241.42, 'cube': (250, 250, 250)}
+    config = {'fx': 368., 'fy': 368., 'cube': (300, 300, 300)} # Kinect V2
     # config = {'fx': 224.5, 'fy': 230.5, 'cube': (300, 300, 300)}  # Creative Gesture Camera
-    # di = ICVLImporter("./capture/")
-    # di.fx = config['fx']
-    # di.fy = config['fy']
-    # di.ux = 160.
-    # di.uy = 120.
-    rtp = RealtimeHandposePipeline(poseNetParams, config, di, verbose=False, comrefNet=None)
+    di = NYUImporter("./capture/")
+    di.fx = config['fx']
+    di.fy = config['fy']
+    di.ux = 261.
+    di.uy = 202.
+    rtp = RealtimeHandposePipeline(poseNetParams, config, di, verbose=False, comrefNet=comrefNetParams)
 
     # use filenames
-    filenames = []
-    for i in testSeqs[0].data:
-        filenames.append(i.fileName)
-    dev = FileDevice(filenames, di)
+    # filenames = []
+    # for i in testSeqs[0].data:
+    #     filenames.append(i.fileName)
+    # dev = FileDevice(filenames, di)
 
     # # use depth camera
     # dev = CreativeCameraDevice(mirror=True)
-    # dev = Kinect2Device(mirror=True)
+    dev = Kinect2Device(mirror=True)
     rtp.processVideo(dev)
