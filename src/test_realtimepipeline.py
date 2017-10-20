@@ -44,7 +44,7 @@ if __name__ == '__main__':
     rng = numpy.random.RandomState(23455)
 
     # di = MSRA15Importer('../data/MSRA15/')
-    # Seq2 = di.loadSequence('test_seq_1')
+    # Seq2 = di.loadSequence('P0')
     # testSeqs = [Seq2]
 
     # di = ICVLImporter('/media/alex/Network Bac/Data Sets/ICVL/')

@@ -29,7 +29,7 @@ import cv2
 import time
 import numpy
 import copy
-from data.transformations import rotatePoint3D, rotatePoints3D
+from data.transformations import rotatePoints3D, rotatePoint3D
 from net.poseregnet import PoseRegNet, PoseRegNetParams
 from net.resnet import ResNet, ResNetParams
 from net.scalenet import ScaleNet, ScaleNetParams
@@ -201,7 +201,7 @@ class RealtimeHandposePipeline(object):
 
             # Display the resulting frame
             starts = time.time()
-            img, poseimg = self.show(frm['frame'], pose)
+            img, poseimg = self.show(frm['frame'], pose, frm['com3D'])
             img = self.addStatusBar(img)
             cv2.imshow('frame', img)
             self.lastshow = time.time()
@@ -406,9 +406,9 @@ class RealtimeHandposePipeline(object):
             raise ValueError("Invalid number of joints {}".format(handpose.shape[0]))
 
         jtI = self.importer.joints3DToImg(handpose)
-        # jtI[:, 0:2] -= numpy.asarray([frame.shape[0]//2, frame.shape[1]//2])
-        # jtI[:, 0:2] *= upsample
-        # jtI[:, 0:2] += numpy.asarray([imgcopy.shape[0]//2, imgcopy.shape[1]//2])
+        jtI[:, 0:2] -= numpy.asarray([frame.shape[0]//2, frame.shape[1]//2])
+        jtI[:, 0:2] *= upsample
+        jtI[:, 0:2] += numpy.asarray([imgcopy.shape[0]//2, imgcopy.shape[1]//2])
         for i in xrange(jtI.shape[0]):
             cv2.circle(imgcopy, (jtI[i, 0], jtI[i, 1]), 3, (255, 0, 0), -1)
 
